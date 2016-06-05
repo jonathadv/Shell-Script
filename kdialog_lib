@@ -1,0 +1,230 @@
+#!/bin/bash
+#
+# ----------------------------------------------------------------------------
+# This script helps to create and use KDialog progress bar with d-bus.
+#
+# Author: Jonatha Daguerre Vasconcelos
+# Version: 1.0
+# Date: 27/08/2014
+# Licence: GPL
+# ----------------------------------------------------------------------------
+
+
+
+#
+# Create progress bar dialog
+# Params:
+#  Title
+#  Message
+#
+# Returns:
+#  The d-bus reference for the dialog box.
+## Params:
+#  Progress bar d-bus reference
+progress_bar_create(){
+    
+    local tittle="$1"
+    local message="$2"
+    local has_cancel_button="$3"
+    
+    [[ -z ${has_cancel_button} ]] && has_cancel_button="false"
+    
+    if [[ -z ${tittle} ]] || [[ -z ${message} ]]; then
+        
+        printf "\n"
+        printf "Missing parameters! Try:\n"
+        printf "progress_bar_create <title> <message>\n"
+        printf "\n"
+        
+        return 1
+    fi
+    
+    
+    PROGRESS_INSTANCE=$(kdialog --title "$title" --progressbar "$message")
+    
+    if ${has_cancel_button}; then
+        qdbus $PROGRESS_INSTANCE showCancelButton true
+    fi
+    
+    printf "${PROGRESS_INSTANCE}\n"
+    
+}
+
+
+#
+# Update progress bar dialog
+# Params:
+#  Progress bar d-bus reference
+#  Percentage (a integer number between 0 and 100)
+#
+progress_bar_update(){
+
+    local progress_dialog_instance="$1"
+    local percentage=$2
+    
+    if [[ -z ${progress_dialog_instance} ]] || [[ -z ${percentage} ]]; then
+        
+        printf "\n"
+        printf "Missing parameters! Try:\n"
+        printf "progress_bar_create <dialog instance> <percentage>\n"
+        printf "\n"
+        
+        return 1
+    fi
+    
+    
+    qdbus ${progress_dialog_instance} Set org.kde.kdialog.ProgressDialog value ${percentage}
+       
+}
+
+
+#
+# Finished the progress bar and close the window
+# Params:
+#  Progress bar d-bus reference
+#
+progress_bar_finish(){
+    
+    local progress_dialog_instance="$1"
+    
+    if [[ -z ${progress_dialog_instance} ]]; then
+        
+        printf "\n"
+        printf "Missing parameters! Try:\n"
+        printf "progress_bar_create <dialog instance>\n"
+        printf "\n"
+        
+        return 1
+    fi
+
+    qdbus ${progress_dialog_instance} org.kde.kdialog.ProgressDialog.setLabelText "Finished"
+    sleep 3
+    qdbus ${progress_dialog_instance} org.kde.kdialog.ProgressDialog.close
+
+
+}
+
+
+
+#
+# Check if the "cancel" button was pressed
+# Params:
+#  Progress bar d-bus reference
+#
+progress_bar_was_cancelled(){
+
+    local progress_dialog_instance=$@
+    
+    if [[ -z ${progress_dialog_instance} ]]; then
+        
+        printf "\n"
+        printf "Missing parameters! Try:\n"
+        printf "progress_bar_create <dialog instance>\n"
+        printf "\n"
+        
+        return 1
+    fi
+
+    qdbus ${progress_dialog_instance} wasCancelled
+
+}
+
+
+#
+# Close the dialog box
+# Params:
+#  Progress bar d-bus reference
+#
+progress_bar_exit(){
+    
+    local progress_dialog_instance=$@
+    
+    if [[ -z ${progress_dialog_instance} ]]; then
+        
+        printf "\n"
+        printf "Missing parameters! Try:\n"
+        printf "progress_bar_create <dialog instance>\n"
+        printf "\n"
+        
+        return 1
+    fi
+   
+    qdbus ${progress_dialog_instance} org.kde.kdialog.ProgressDialog.close
+
+
+}
+
+
+
+
+
+#
+# Show a simple help text
+#
+kdialog_lib_help(){
+
+printf "\n====== H E L P ======\n"
+    
+    printf "Creating the dialog with cancel button\n"
+    printf "progress_bar_create \"Teste1\" \"Test1\" true"
+    
+    printf "\n\nUpdating bar to 20...\n"
+    printf "progress_bar_update \"\${instance}\" 20"
+    
+    printf "\n\nChecking if it was canceled...\n"
+    printf "progress_bar_was_cancelled \${instance}"
+     
+    printf "\n\nExiting...\n"
+    printf "progress_bar_exit \${inst}"
+    
+
+    printf "\n\n====================\n"
+
+}
+
+
+
+
+
+
+
+# Run tests
+test01(){
+    
+    printf "\n====== T E S T ======\n"
+    
+    printf "__Creating the dialog with cancel button...\n"
+    inst=$(progress_bar_create "Teste1" "Test1" true)
+    
+    printf "__Updating bar to 20...\n"
+    progress_bar_update "${inst}" 20
+    sleep 5
+    
+    printf "__Checking if it was canceled...\n"
+    progress_bar_was_cancelled ${inst}
+    sleep 5
+    
+    printf "__Checking if it was canceled again...\n"
+    progress_bar_was_cancelled ${inst}
+    sleep 5
+    
+    printf "__Exiting...\n"
+    progress_bar_exit ${inst}
+    
+
+    printf "====================\n"
+    
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
