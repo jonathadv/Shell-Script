@@ -93,7 +93,7 @@ $ ./cowsay_and_whatthecommit.sh
 ```
 
 ---
-## fix_icc_profile_bug.sh
+## fix_icc_profile_bug
 This script is a workaround to prevent some pictures to be displayed with wrong colors. 
 
 Source forum that this fix was suggested: https://bugs.launchpad.net/ubuntu/+source/eog/+bug/938751
