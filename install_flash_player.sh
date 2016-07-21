@@ -1,65 +1,49 @@
 #!/bin/bash
 #
 # ----------------------------------------------------------------------------
-# Description: Script to install Adobe Flash Player in Linux machines with Mozilla Firefox.
+# Description: Script to install Adobe Flash Player in GNU/Linux machines with Mozilla Firefox.
+# It downloads the tarball direct from Adobe web site.
+#
+# Author: Jonatha Daguerre Vasconcelos <jonatha@daguerre.com.br>
+# Version: 2.0
+# Date: 20/07/2016
+# Licence: GPL
 #
 # Usage:
+# sudo ./install_flash_player.sh
 #
-# Local installation:
-# sudo ./install_flash_player.sh <tarball_file.tar.gz>
-#
-# Internet intallation:
-# sudo ./install_flash_player.sh --update <flashplayer version>
-#
-# e.g: ./install_flash_player.sh --update 11.2.202.521
-#
-# You can get the latest version of Flash Player in that URL: https://get.adobe.com/br/flashplayer/
-#
-# TODO: It should be refactored!
-#
-# Author: Jonatha Daguerre Vasconcelos
-# Version: 1.0
-# Date: 03/10/2015
-# Licence: GPL
-# ----------------------------------------------------------------------------
-#
-# Default URL for download: https://fpdownload.adobe.com/get/flashplayer/pdc/11.2.202.508/install_flash_player_11_linux.x86_64.tar.gz
 #
 
-set -o xtrace
+FLASH_TARBALL_NAME='install_flash_player_11_linux.x86_64.tar.gz'
+TMP_DIR="$(mktemp -d)"
 
-IS_UPDATE=0
-FLASH_VERSION='11.2.202.621' # Default value
-FLASH_TARBALL_NAME='install_flash_player_11_linux.x86_64.tar.gz' # Default value
-FILENAME='adobe-flashplugin.tar.gz'
-TMP_DIR='/tmp/adobe_flashplugin_installer'
+function fp_exit_with_error() {
+    local red='\033[0;31m'
+    local nc='\033[0m'
 
-if [ "${1}" == "--update" ];then
-    IS_UPDATE=1
-    [ -n "${2}" ] && FLASH_VERSION=${2}
-else
-    flash_tarball="${1}"
-fi
-
-
-
-
-
-fp_exit_with_error() {
-    echo -en "$1"
-    echo "Some error happend! The Flash plugin was NOT installed."
+    echo
+    echo
+    echo -en "\t+------------------------------+\n"
+    echo -en "\t|                              |\n"
+    echo -en "\t| The installation has failed! |\n"
+    echo -en "\t|                              |\n"
+    echo -en "\t+------------------------------+\n"
+    echo
+    echo -en "${red}Cause: ${@}${nc}\n"
+    echo
+    echo
+    remove_tmp_files
     exit 1
 }
 
-check_root(){
+function check_root(){
 
     if [[ "$(id -u)" != "0" ]];then
-        fp_exit_with_error "Must do be root to install Flash Player plugin."
+        fp_exit_with_error "Must be root to install Flash Player plugin."
     fi
 }
 
-check_last_plugin_version(){
-    echo "Checking the latest version of Flash Plugin..."
+function check_last_plugin_version(){
     local flash_last_version=$(curl 'https://get.adobe.com/br/flashplayer/'  \
         -H 'Host: get.adobe.com'  \
         -H 'User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:38.0) Gecko/20100101 Firefox/38.0 Iceweasel/38.8.0' \
@@ -73,82 +57,62 @@ check_last_plugin_version(){
     | egrep --color=auto '11.[0-9.]{4,20}\b' -o | head -1)
 
     if [[ -n "${flash_last_version}" ]]; then
-        echo "The latest Flash plugin version is ${flash_last_version}."
-        FLASH_VERSION="${flash_last_version}"
+        printf "${flash_last_version}"
     else
-        echo "Unable to retrive the latest version of Flash plugin. Trying to install the default version: ${FLASH_VERSION}"
+        fp_exit_with_error 'Unable to retrive the latest version of Flash plugin from internet.'
     fi
 }
 
-setup_files(){
+function download_tarball(){
+    local version="${1}"
+    local url="https://fpdownload.adobe.com/get/flashplayer/pdc/${version}/${FLASH_TARBALL_NAME}"
 
-#    if [[ -z ${flash_tarball} ]];then
-#        fp_exit_with_error "Please send the tarball file as parameter:\n$0 adobe-flashplugin.tar.gz \n\nor if you want to update it via internet, use:\n$0 --update <version>.\n\n"
-#    fi
+    echo "Flash Player version is: ${version}"
+    echo "Trying to download file from ${url}..."
+    echo
 
-    if [[ ${IS_UPDATE} = "1" ]];then
-        check_last_plugin_version
-        wget -v https://fpdownload.adobe.com/get/flashplayer/pdc/${FLASH_VERSION}/${FLASH_TARBALL_NAME}
-        flash_tarball="${FLASH_TARBALL_NAME}"
-    else
-        echo "Updating from local file..."
-        if [[ ! -f ${flash_tarball} ]];then
-            fp_exit_with_error "File \"${flash_tarball}\" doesn't exist!"
-        fi
-    fi
+    wget -v ${url} -O "${TMP_DIR}/${FLASH_TARBALL_NAME}"
 
-    if [[ -z ${TMP_DIR} ]];then
-        fp_exit_with_error "Temp directory not set. Please set a value for it."
-    fi
+    [[ "${?}" != '0'  ]] && fp_exit_with_error 'Unable to download the Flash plugin tarball from ${url}'
+}
 
-    if [[ -d ${TMP_DIR} ]];then
-        rm -rf ${TMP_DIR}
-    fi
 
-    mkdir -p ${TMP_DIR}
-
-    cp -f "${flash_tarball}" "${TMP_DIR}/${FILENAME}"
-
+function untar_file(){
     cd "${TMP_DIR}"
+    tar -xzf ${FLASH_TARBALL_NAME} || fp_exit_with_error "Unable unpack plugin."
 }
 
+function check_installation_files(){
+    cd "${TMP_DIR}"
 
-untar_file(){
-
-    tar -xzf $FILENAME || fp_exit_with_error "cannot unpack plugin"
-}
-
-check_installation_files(){
-
-
-    if [[ ! -f 'libflashplayer.so' ]];then
+    if [[ ! -f 'libflashplayer.so' ]]; then
         fp_exit_with_error "Missing file ${TMP_DIR}/libflashplayer.so"
     fi
 
-    if [[ ! -d 'usr/bin' ]];then
+    if [[ ! -d 'usr/bin' ]]; then
         fp_exit_with_error "Missing directory ${TMP_DIR}/usr/bin"
     fi
 
-    if [[ ! -d 'usr/lib' ]];then
+    if [[ ! -d 'usr/lib' ]]; then
         fp_exit_with_error "Missing directory ${TMP_DIR}/usr/lib"
     fi
 
-    if [[ ! -d 'usr/lib64' ]];then
+    if [[ ! -d 'usr/lib64' ]]; then
         fp_exit_with_error "Missing directory ${TMP_DIR}/usr/lib64"
     fi
 
-    if [[ ! -d 'usr/share' ]];then
+    if [[ ! -d 'usr/share' ]]; then
         fp_exit_with_error "Missing directory ${TMP_DIR}/usr/share"
     fi
 
 }
 
-install_plugin(){
-    echo ''
+function install_plugin(){
+    echo
     echo -n "Installing ${TMP_DIR}/libflashplayer.so to /usr/lib/flashplugin-installer/"
     install -m 644 ${TMP_DIR}/libflashplayer.so /usr/lib/flashplugin-installer/
 
-    if [[ "$?" == "0" ]];then
+    if [[ "${?}" == '0' ]]; then
         echo '  ...............[Done]'
     else
         fp_exit_with_error "Error when intalling libflashplayer.so"
@@ -156,21 +120,21 @@ install_plugin(){
 }
 
 
-update_alternatives(){
-    echo ''
+function update_alternatives(){
+    echo
     echo -n "Running update-alternatives for /usr/lib/flashplugin-installer/libflashplayer.so"
     update-alternatives --install "/usr/lib/mozilla/plugins/flashplugin-alternative.so" "mozilla-flashplugin" /usr/lib/flashplugin-installer/libflashplayer.so 50
 
-    if [[ "$?" == "0" ]];then
-        echo '  ...............................[Done]'
+    if [[ "$?" == '0' ]]; then
+        echo '  ..................[Done]'
     else
         fp_exit_with_error "Error when configuring update-alternatives for libflashplayer.so"
     fi
 }
 
 
-configure_extras(){
-    echo ''
+function configure_extras(){
+    echo
     echo -n "Configuring extra files"
 
 
@@ -192,56 +156,75 @@ configure_extras(){
     chmod 622 /usr/share/pixmaps/flash-player-properties.png
 
 
-    if [[ "$?" == "0" ]];then
-        echo '  ........................................................................................[Done]'
+    if [[ "$?" == '0' ]]; then
+        echo '  ...........................................................................[Done]'
     else
         fp_exit_with_error "Error when configuring extras."
     fi
 
-    echo ''
-    echo ''
+    echo
+    echo
 
 }
 
 
-remove_tmp_files(){
+function remove_tmp_files(){
+    echo 'Removing temp files...'
     rm -rf "${TMP_DIR:=/tmp/adobe_flashplugin_installer}"
 }
 
 
-print_start(){
-
-    echo -en "\n\n\t#### #### #### #### #### ####\n"
-    echo -en "\t##                         ##\n"
-    echo -en "\t##   FlashPlayer Installer ##\n"
-    echo -en "\t##    By Jonatha Daguerre  ##\n"
-    echo -en "\t##                         ##\n"
-    echo -en "\t#### #### #### #### #### ####\n"
-
-}
-
-print_end(){
-
-    echo -en "\t#### #### #### #### #### ####\n"
-    echo -en "\t####                     ####\n"
-    echo -en "\t####       I T'  S       ####\n"
-    echo -en "\t####       D O N E       ####\n"
-    echo -en "\t####                     ####\n"
-    echo -en "\t#### #### #### #### #### ####\n"
+function print_start(){
+    echo
+    echo
+    echo -en "\t+---------------------------+\n"
+    echo -en "\t|                           |\n"
+    echo -en "\t|    FlashPlayer Installer  |\n"
+    echo -en "\t|                           |\n"
+    echo -en "\t+---------------------------+\n"
+    echo
+    echo
 }
 
 
-#
-# Calling the functions...
-#
+function print_end(){
+    echo
+    echo
+    echo -en "\t+---------------------------+\n"
+    echo -en "\t|                           |\n"
+    echo -en "\t| The installation is done! |\n"
+    echo -en "\t|                           |\n"
+    echo -en "\t+---------------------------+\n"
+    echo
+    echo
+}
 
-print_start
-check_root
-setup_files
-untar_file
-check_installation_files
-install_plugin
-update_alternatives
-configure_extras
-remove_tmp_files
-print_end
+
+function main(){
+    print_start
+    check_root
+    local version=$(check_last_plugin_version)
+
+    [[ -z "${version}" ]] && fp_exit_with_error 'Unable to get the lastest Flash Plugin Version.'
+
+    download_tarball "${version}"
+
+    untar_file
+
+    check_installation_files
+
+    install_plugin
+
+    update_alternatives
+
+    configure_extras
+
+    remove_tmp_files
+
+    print_end
+
+}
+
+
+# Let's start it!
+main
