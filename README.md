@@ -7,16 +7,20 @@ Repository for some useful shell scripts which I've done to solve problems or ma
 ### install_flash_player.sh
 Script to install Adobe Flash Player in GNU/Linux machines with Mozilla Firefox. It finds the latest plugin version and downloads the tarball direct from Adobe web site.
 
-**Usage:** ``sudo ./install_flash_player.sh``
-
 **Requires:**
 * curl
 * wget
+
+**Usage:** ``sudo ./install_flash_player.sh``
 
 ---
 
 ### kdialog_progbar_helper
 This script is a helper to simplify the creation and update of KDialog progress bar with d-bus.
+
+**Requires:**
+* kdialog
+* d-bus
 
 
 **Usage:** ``source ./kdialog_progbar_helper``
