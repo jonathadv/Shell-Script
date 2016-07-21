@@ -5,15 +5,15 @@
 ---
 **Table of Contents**  
 
-- [install_flash_player.sh](#install_flash_player.sh)
+- [install_flash_player.sh](#install_flash_player)
 - [kdialog_progbar_helper](#kdialog_progbar_helper)
-- [cowsay_and_whatthecommit.sh](#cowsay_and_whatthecommit.sh)
+- [cowsay_and_whatthecommit.sh](#cowsay_and_whatthecommit)
 - [fix_icc_profile_bug.sh](#fix_icc_profile_bug)
 
 
 
 ---
-## install_flash_player.sh
+## install_flash_player
 Script to install Adobe Flash Player in GNU/Linux machines with Mozilla Firefox. It finds the latest plugin version and downloads the tarball direct from Adobe web site.
 
 **Requires:**
@@ -60,7 +60,7 @@ There is a test to create a dialog with a cancel button. To run it, call the fun
 ---
 
 
-## cowsay_and_whatthecommit.sh
+## cowsay_and_whatthecommit
 
 This script uses two very funny web sites to display the Cowsay (based o the cowsay cli program by Tony Monroe) and random commit messages. The result is basically a cow saying a funny commit message.
 
