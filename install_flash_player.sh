@@ -14,6 +14,9 @@
 #
 #
 
+set -o pipefail
+set -o nounset
+
 FLASH_TARBALL_NAME='install_flash_player_11_linux.x86_64.tar.gz'
 TMP_DIR="$(mktemp -d)"
 
@@ -73,13 +76,13 @@ function download_tarball(){
 
     wget -v ${url} -O "${TMP_DIR}/${FLASH_TARBALL_NAME}"
 
-    [[ "${?}" != '0'  ]] && fp_exit_with_error 'Unable to download the Flash plugin tarball from ${url}'
+    [[ "${?}" != '0'  ]] && fp_exit_with_error "Unable to download the Flash plugin tarball from ${url}"
 }
 
 
 function untar_file(){
     cd "${TMP_DIR}"
-    tar -xzf ${FLASH_TARBALL_NAME} || fp_exit_with_error "Unable unpack plugin."
+    tar -xzf ${FLASH_TARBALL_NAME} || fp_exit_with_error "Unable to unpack the plugin."
 }
 
 function check_installation_files(){
@@ -108,22 +111,36 @@ function check_installation_files(){
 }
 
 function install_plugin(){
+    local plugin_lib_dir='/usr/lib/flashplugin-installer'
+    
+    if [[ ! -d "${plugin_lib_dir}" ]]; then
+        mkdir -p "${plugin_lib_dir}"
+        chmod 755 "${plugin_lib_dir}"
+    fi
+
     echo
-    echo -n "Installing ${TMP_DIR}/libflashplayer.so to /usr/lib/flashplugin-installer/"
-    install -m 644 ${TMP_DIR}/libflashplayer.so /usr/lib/flashplugin-installer/
+    echo -n "Installing ${TMP_DIR}/libflashplayer.so to ${plugin_lib_dir}"
+    install -m 644 ${TMP_DIR}/libflashplayer.so ${plugin_lib_dir}
 
     if [[ "${?}" == '0' ]]; then
-        echo '  ...............[Done]'
+        echo '  ................[Done]'
     else
         fp_exit_with_error "Error when intalling libflashplayer.so"
     fi
+
+    
+    update_alternatives "${plugin_lib_dir}"
+
+    configure_extras
 }
 
 
 function update_alternatives(){
+    local plugin_lib_dir="${1}"
+    
     echo
-    echo -n "Running update-alternatives for /usr/lib/flashplugin-installer/libflashplayer.so"
-    update-alternatives --install "/usr/lib/mozilla/plugins/flashplugin-alternative.so" "mozilla-flashplugin" /usr/lib/flashplugin-installer/libflashplayer.so 50
+    echo -n "Running update-alternatives for ${plugin_lib_dir}/libflashplayer.so"
+    update-alternatives --install "/usr/lib/mozilla/plugins/flashplugin-alternative.so" "mozilla-flashplugin" ${plugin_lib_dir}/libflashplayer.so 50
 
     if [[ "$?" == '0' ]]; then
         echo '  ..................[Done]'
@@ -141,16 +158,20 @@ function configure_extras(){
     cp -f ${TMP_DIR}/usr/bin/flash-player-properties /usr/bin
     chmod 755 /usr/bin/flash-player-properties
 
-    cp -f ${TMP_DIR}/usr/lib64/kde4/kcm_adobe_flash_player.so /usr/lib/kde4/
-    chmod 622 /usr/lib/kde4/kcm_adobe_flash_player.so
+    if [[ -d /usr/lib/kde4/ ]]; then
+        cp -f ${TMP_DIR}/usr/lib64/kde4/kcm_adobe_flash_player.so /usr/lib/kde4/
+        chmod 622 /usr/lib/kde4/kcm_adobe_flash_player.so
+    fi
+
+    if [[ -d /usr/share/kde4/services ]]; then
+        cp -f ${TMP_DIR}/usr/share/kde4/services/kcm_adobe_flash_player.desktop /usr/share/kde4/services/
+        chmod 622 /usr/share/kde4/services/kcm_adobe_flash_player.desktop
+    fi
 
     cp -f ${TMP_DIR}/usr/share/applications/flash-player-properties.desktop /usr/share/applications/
     chmod 755 /usr/share/applications/flash-player-properties.desktop
 
     cp -fR ${TMP_DIR}/usr/share/icons/hicolor /usr/share/icons/hicolor
-
-    cp -f ${TMP_DIR}/usr/share/kde4/services/kcm_adobe_flash_player.desktop /usr/share/kde4/services/
-    chmod 622 /usr/share/kde4/services/kcm_adobe_flash_player.desktop
 
     cp -f ${TMP_DIR}/usr/share/pixmaps/flash-player-properties.png /usr/share/pixmaps/
     chmod 622 /usr/share/pixmaps/flash-player-properties.png
@@ -213,11 +234,7 @@ function main(){
 
     check_installation_files
 
-    install_plugin
-
-    update_alternatives
-
-    configure_extras
+    install_plugin    
 
     remove_tmp_files
 
