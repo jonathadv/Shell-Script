@@ -24,3 +24,5 @@ message=$(
 
 # Use curl to get the HTML with the cow and the commit message.
 curl cowsay.morecode.org/say -d message="$message" -d format=text 2> /dev/null
+
+echo
