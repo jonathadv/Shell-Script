@@ -111,7 +111,13 @@ function check_installation_files(){
 }
 
 function install_plugin(){
-    local plugin_lib_dir='/usr/lib/flashplugin-installer'
+    local plugin_lib_dir='/usr/lib'
+
+    if [[ -d "${plugin_lib_dir}/adobe-flashplugin" ]]; then
+        plugin_lib_dir="${plugin_lib_dir}/adobe-flashplugin"
+    else
+        plugin_lib_dir="${plugin_lib_dir}/flashplugin-installer"
+    fi
     
     if [[ ! -d "${plugin_lib_dir}" ]]; then
         mkdir -p "${plugin_lib_dir}"
@@ -120,14 +126,13 @@ function install_plugin(){
 
     echo
     echo -n "Installing ${TMP_DIR}/libflashplayer.so to ${plugin_lib_dir}"
+
     install -m 644 ${TMP_DIR}/libflashplayer.so ${plugin_lib_dir}
 
-    if [[ "${?}" == '0' ]]; then
-        echo '  ................[Done]'
-    else
-        fp_exit_with_error "Error when intalling libflashplayer.so"
-    fi
-
+    [[ "${?}" != '0' ]] && fp_exit_with_error "Error when intalling libflashplayer.so"
+    
+    echo '  ................[Done]'
+	
     
     update_alternatives "${plugin_lib_dir}"
 
@@ -140,7 +145,7 @@ function update_alternatives(){
     
     echo
     echo -n "Running update-alternatives for ${plugin_lib_dir}/libflashplayer.so"
-    update-alternatives --install "/usr/lib/mozilla/plugins/flashplugin-alternative.so" "mozilla-flashplugin" ${plugin_lib_dir}/libflashplayer.so 50
+    update-alternatives --install "/usr/lib/mozilla/plugins/flashplugin-alternative.so" "mozilla-flashplugin" "${plugin_lib_dir}/libflashplayer.so" 50
 
     if [[ "$?" == '0' ]]; then
         echo '  ..................[Done]'
