@@ -8,7 +8,7 @@
 - [install_flash_player.sh](#install_flash_player.sh)
 - [kdialog_progbar_helper](#kdialog_progbar_helper)
 - [cowsay_and_whatthecommit.sh](#cowsay_and_whatthecommit.sh)
-- [fix_icc_profile_bug.sh](#fix_icc_profile_bug.sh)
+- [fix_icc_profile_bug.sh](#fix_icc_profile_bug)
 
 
 
