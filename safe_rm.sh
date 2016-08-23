@@ -1,5 +1,6 @@
 function rm(){
-    local trash='/home/latam/.trash'
+    local trash='${HOME}/.trash'
+    [[ ! -d "${trash}" ]] && mkdir "${trash}"
     
     if ((${#@} < 1)); then
         echo "[safe rm]: missing operand"
@@ -22,7 +23,7 @@ function rm(){
             
         else
             echo "[safe rm]: cannot stat ‘${file}’: No such file or directory"
-            break
+            continue
         fi
         
     done
