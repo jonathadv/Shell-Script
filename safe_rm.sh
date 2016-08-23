@@ -1,5 +1,5 @@
 function rm(){
-    local trash='${HOME}/.trash'
+    local trash="${HOME}/.trash"
     [[ ! -d "${trash}" ]] && mkdir "${trash}"
     
     if ((${#@} < 1)); then
