@@ -32,14 +32,15 @@ function rm(){
     fi
     
     if [[ -f '/usr/bin/gvfs-trash' ]]; then
+        local gvfs_version="$(gvfs-trash --version 2> /dev/null | cut -d ' ' -f 2)"
     
         if [[ "$1" == "--help" ]]; then
             echo "Usage: rm FILE..."
-            echo "Move files to trash using $(gvfs-trash --version) instead of delete them permanently."
+            echo "Move files to trash using gvfs-trash instead of delete them permanently."
             return 0
         fi
         
-        echo "--- safe rm ($(gvfs-trash --version)) ---"
+        echo "--- safe rm (gvfs$([[ -n ${gvfs_version} ]] && printf " ${gvfs_version}")) ---"
 
         if /usr/bin/gvfs-trash "${@}"; then
             echo "File(s) [${@}] sent to trash."
