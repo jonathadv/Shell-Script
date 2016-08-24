@@ -1,3 +1,28 @@
+#!/usr/bin/env bash
+#
+# ----------------------------------------------------------------------------
+#
+# This script prevents accidental deletions by sending files to Trash.
+# If gvfs-trash command is available in the system, it will be used, otherwise,
+# a folder called .trash will be created inside ${HOME} directory and the
+# files will be moved to there.
+#
+# Usage:
+# source safe_rm
+#
+# The best way to use this function is to source it in .bashrc file.
+# WARNING: This approach doesn't work with `sudo` command or when using
+# different user accounts.
+#
+#
+# Author: Jonatha Daguerre Vasconcelos <jonatha@daguerre.com.br>
+# Version: 1.0
+# Date: 24/08/2016
+# Licence: GPL
+#
+# ----------------------------------------------------------------------------
+#
+
 function rm(){    
     if [[ -f '/usr/bin/gvfs-trash' ]]; then
         echo "--- safe rm ($(gvfs-trash --version)) ---"
