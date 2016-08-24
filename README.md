@@ -9,6 +9,7 @@
 - [kdialog_progbar_helper](#kdialog_progbar_helper)
 - [cowsay_and_whatthecommit.sh](#cowsay_and_whatthecommit)
 - [fix_icc_profile_bug.sh](#fix_icc_profile_bug)
+- [safe_rm](#safe_rm)
 
 
 
@@ -20,7 +21,7 @@ Script to install Adobe Flash Player in GNU/Linux machines with Mozilla Firefox.
 * curl
 * wget
 
-**Usage:** ``sudo ./install_flash_player.sh``
+**Usage:** `sudo ./install_flash_player.sh`
 
 ---
 
@@ -32,30 +33,30 @@ This script is a helper to simplify the creation and update of KDialog progress 
 * d-bus
 
 
-**Usage:** ``source ./kdialog_progbar_helper``
+**Usage:** `source ./kdialog_progbar_helper`
 
 #### To see the help
 
-Call the function ``kdialog_progbar_help``
+Call the function `kdialog_progbar_help`
 
 
 #### Creating a dialog with cancel button
-``progress_bar_create "<Title>" "<Text>" true``
+`progress_bar_create "<Title>" "<Text>" true`
 
 It returns a string with the d-bus instance
 
 
 #### Updating the bar to 20%
-``progress_bar_update "${instance}" 20``
+`progress_bar_update "${instance}" 20`
 
 #### Checking if it was canceled
-``progress_bar_was_canceled ${instance}``
+`progress_bar_was_canceled ${instance}`
 
 #### Closing progress bar
-``progress_bar_exit ${instance}``
+`progress_bar_exit ${instance}`
 
 #### Running tests
-There is a test to create a dialog with a cancel button. To run it, call the function ``test01``
+There is a test to create a dialog with a cancel button. To run it, call the function `test01`
 
 ---
 
@@ -67,7 +68,7 @@ This script uses two very funny web sites to display the Cowsay (based o the cow
 **Requires:**
 * curl
 
-**Usage:** ``./cowsay_and_whatthecommit.sh``
+**Usage:** `./cowsay_and_whatthecommit.sh`
 
 
 #### APIs
@@ -78,7 +79,7 @@ http://whatthecommit.com (by Nick Gerakines <https://github.com/ngerakines/commi
 
 
 #### Result
-```
+``
 $ ./cowsay_and_whatthecommit.sh
   _______________________________________
 / fixed some minor stuff, might need some \
@@ -90,7 +91,7 @@ $ ./cowsay_and_whatthecommit.sh
                  ||----w |
                  ||     ||
     
-```
+``
 
 ---
 ## fix_icc_profile_bug
@@ -101,6 +102,25 @@ Source forum that this fix was suggested: https://bugs.launchpad.net/ubuntu/+sou
 Put this file in startup folder in your graphical environment. Since I use KDE I put the script to start with KDE in $HOME/.kde/Autostart.
 
 #### What it runs
-``xprop -root -remove _ICC_PROFILE``
+`xprop -root -remove _ICC_PROFILE`
+
+---
+
+## safe_rm
+ This script prevents accidental deletions by sending files to Trash.
+ 
+ If `gvfs-trash` command is available in the system, it will be used, otherwise, a folder called `.trash` will be created inside `${HOME}` directory and the files will be moved to there.
+
+ The best way to use this function is to source it in .bashrc file.
+ 
+**WARNING:** This approach doesn't work with `sudo` command or when using different user accounts.
+ 
+**Requires:**
+* rm
+
+**Optional:**
+* gvfs-trash
+
+**Usage:** `source safe_rm`
 
 ---
