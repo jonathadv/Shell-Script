@@ -79,7 +79,7 @@ http://whatthecommit.com (by Nick Gerakines <https://github.com/ngerakines/commi
 
 
 #### Result
-``
+```
 $ ./cowsay_and_whatthecommit.sh
   _______________________________________
 / fixed some minor stuff, might need some \
@@ -91,7 +91,7 @@ $ ./cowsay_and_whatthecommit.sh
                  ||----w |
                  ||     ||
     
-``
+```
 
 ---
 ## fix_icc_profile_bug
@@ -111,7 +111,7 @@ Put this file in startup folder in your graphical environment. Since I use KDE I
  
  If `gvfs-trash` command is available in the system, it will be used, otherwise, a folder called `.trash` will be created inside `${HOME}` directory and the files will be moved to there.
 
- The best way to use this function is to source it in .bashrc file.
+ The best way to use this function is to source it in `.bashrc` file.
  
 **WARNING:** This approach doesn't work with `sudo` command or when using different user accounts.
  
@@ -122,5 +122,27 @@ Put this file in startup folder in your graphical environment. Since I use KDE I
 * gvfs-trash
 
 **Usage:** `source safe_rm`
+
+#### Result with gvfs-trash
+```
+$ rm folder*
+--- safe rm (gvfs 1.22.2) ---
+File(s) [folder1 folder2 folder3 folder4] sent to trash.
+------------------------------
+```
+
+#### Result without gvfs-trash
+```
+$ rm folder*
+--- safe rm ---
+“folder1” -> “/home/user/.trash/folder1.1472009967”
+“folder2” -> “/home/user/.trash/folder2.1472009967”
+“folder3” -> “/home/user/.trash/folder3.1472009968”
+“folder4” -> “/home/user/.trash/folder4.1472009968”
+
+Trash size: 20K /home/user/.trash
+---------------
+
+```
 
 ---
