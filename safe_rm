@@ -23,8 +23,22 @@
 # ----------------------------------------------------------------------------
 #
 
-function rm(){    
+function rm(){
+
+    if ((${#@} < 1)); then
+        echo '[safe rm]: missing operand'
+        echo 'Try `rm --help` for more information'
+        return 1
+    fi
+    
     if [[ -f '/usr/bin/gvfs-trash' ]]; then
+    
+        if [[ "$1" == "--help" ]]; then
+            echo "Usage: rm FILE..."
+            echo "Move files to trash using $(gvfs-trash --version) instead of delete them permanently."
+            return 0
+        fi
+        
         echo "--- safe rm ($(gvfs-trash --version)) ---"
 
         if /usr/bin/gvfs-trash "${@}"; then
@@ -38,12 +52,6 @@ function rm(){
     else   
         local trash="${HOME}/.trash"
         [[ ! -d "${trash}" ]] && mkdir "${trash}"
-        
-        if ((${#@} < 1)); then
-            echo '[safe rm]: missing operand'
-            echo 'Try `rm --help` for more information'
-            return 1
-        fi
         
         if [[ "$1" == "--help" ]]; then
             echo "Usage: rm FILE..."
