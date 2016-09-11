@@ -22,7 +22,7 @@
 
 
 # Set file location
-file="${HOME}/.local/share/Trash/metadata2"
+file="${HOME}/.local/share/Trash/metadata"
 
 
 
