@@ -16,8 +16,9 @@
 #
 #
 # Author: Jonatha Daguerre Vasconcelos <jonatha@daguerre.com.br>
-# Version: 1.0
+# Version: 1.1
 # Date: 24/08/2016
+# Update: 05/10/2016
 # Licence: GPL
 #
 # ----------------------------------------------------------------------------
@@ -40,12 +41,12 @@ function rm(){
             return 0
         fi
         
-        echo "--- safe rm (gvfs$([[ -n ${gvfs_version} ]] && printf " ${gvfs_version}")) ---"
+        echo "--- safe rm (gvfs$([[ -n ${gvfs_version} ]] && printf '%s' " ${gvfs_version}")) ---"
 
         if /usr/bin/gvfs-trash "${@}"; then
-            echo "File(s) [${@}] sent to trash."
+            echo "File(s) [${*}] sent to trash."
         else
-           echo "Error when deleting file(s): ${@}"
+           echo "Error when deleting file(s): ${*}"
         fi
 
         echo '------------------------------'
@@ -61,11 +62,11 @@ function rm(){
         fi
         
         echo '--- safe rm ---'
-        for file in $@; do
+        for file in "${@}"; do
         
             if [[ -f "${file}" || -d "${file}" ]]; then
                 file="${file/%\//}"
-                mv -v "${file/%\//}" ${trash}/${file}.$(date +%s);
+                mv -v "${file/%\//}" "${trash}/${file}.$(date +%s)"
                 
             else
                 echo "[safe rm]: cannot stat ‘${file}’: No such file or directory"

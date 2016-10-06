@@ -16,7 +16,7 @@
 #
 # Author: Jonatha Daguere Vasconcelos <jonatha@daguerre.com.br>
 # Since: 14/05/2014
-# Version: 1.0
+# Version: 1.1
 # Licence: GPL
 # ----------------------------------------------------------------------------
 
@@ -28,16 +28,16 @@ file="${HOME}/.local/share/Trash/metadata"
 
 
 # Test the file
-if [ ! -f ${file} ]
+if [ ! -f "${file}" ]
  then
   echo "This \"${file}\" doesn't exist!"
   exit 1
 fi
 
 # Create the backup file
-dateFormat="$(date +%y"."%m"."%d)"
+dateFormat="$(date +%y.%m.%d)"
 echo -ne '\nCreating the backup file: '
-mv -v ${file} ${file}_${dateFormat}
+mv -v "${file}" "${file}_${dateFormat}"
 
 # Create a new metadata file
 echo -ne "\nCreating the new metadata file to \"${file}\"..."
@@ -45,6 +45,6 @@ echo -ne "\nCreating the new metadata file to \"${file}\"..."
 {
     echo "[Cached]"
     echo "Size=0"
-} > ${file}
+} > "${file}"
 
 ([ "$?" == 0 ] && echo -en '[OK]\n\n') || echo -e '[FAILED]\n\n'

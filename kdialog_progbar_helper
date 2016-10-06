@@ -4,8 +4,9 @@
 # This script helps to create and use KDialog progress bar with d-bus.
 #
 # Author: Jonatha Daguerre Vasconcelos <jonatha@daguerre.com.br>
-# Version: 1.0
+# Version: 1.1
 # Date: 27/08/2014
+# Update: 05/10/2016
 # Licence: GPL
 # ----------------------------------------------------------------------------
 
@@ -27,9 +28,9 @@ progress_bar_create(){
     local message="$2"
     local has_cancel_button="$3"
     
-    [[ -z ${has_cancel_button} ]] && has_cancel_button="false"
+    [[ -z "${has_cancel_button}" ]] && has_cancel_button="false"
     
-    if [[ -z ${title} ]] || [[ -z ${message} ]]; then
+    if [[ -z "${title}" || -z "${message}" ]]; then
         
         printf "\n"
         printf "Missing parameters! Try:\n"
@@ -42,11 +43,11 @@ progress_bar_create(){
     
     PROGRESS_INSTANCE=$(kdialog --title "$title" --progressbar "$message")
     
-    if ${has_cancel_button}; then
+    if "${has_cancel_button}"; then
         qdbus $PROGRESS_INSTANCE showCancelButton true
     fi
     
-    printf "${PROGRESS_INSTANCE}\n"
+    printf '%s' "${PROGRESS_INSTANCE}"
     
 }
 
@@ -59,21 +60,18 @@ progress_bar_create(){
 #
 progress_bar_update(){
 
-    local progress_dialog_instance="$1"
-    local percentage=$2
+    local progress_dialog_instance="${1}"
+    local percentage="${2}"
     
-    if [[ -z ${progress_dialog_instance} ]] || [[ -z ${percentage} ]]; then
+    if [[ -z "${progress_dialog_instance}" || -z "${percentage}" ]]; then
         
-        printf "\n"
-        printf "Missing parameters! Try:\n"
-        printf "progress_bar_create <dialog instance> <percentage>\n"
-        printf "\n"
+        printf '%s' "\nMissing parameters! Try:\nprogress_bar_create <dialog instance> <percentage>\n\n"
         
         return 1
     fi
     
     
-    qdbus ${progress_dialog_instance} Set org.kde.kdialog.ProgressDialog value ${percentage}
+    qdbus ${progress_dialog_instance} Set org.kde.kdialog.ProgressDialog value "${percentage}"
        
 }
 
@@ -87,17 +85,14 @@ progress_bar_finish(){
     
     local progress_dialog_instance="$1"
     
-    if [[ -z ${progress_dialog_instance} ]]; then
+    if [[ -z "${progress_dialog_instance}" ]]; then
         
-        printf "\n"
-        printf "Missing parameters! Try:\n"
-        printf "progress_bar_create <dialog instance>\n"
-        printf "\n"
+        printf "\nMissing parameters! Try:\nprogress_bar_create <dialog instance>\n\n"
         
         return 1
     fi
 
-    qdbus ${progress_dialog_instance} org.kde.kdialog.ProgressDialog.setLabelText "Finished"
+    qdbus ${progress_dialog_instance} org.kde.kdialog.ProgressDialog.setLabelText 'Finished'
     sleep 3
     qdbus ${progress_dialog_instance} org.kde.kdialog.ProgressDialog.close
 
@@ -113,14 +108,11 @@ progress_bar_finish(){
 #
 progress_bar_was_canceled(){
 
-    local progress_dialog_instance=$@
+    local progress_dialog_instance="${@}"
     
-    if [[ -z ${progress_dialog_instance} ]]; then
+    if [[ -z "${progress_dialog_instance}" ]]; then
         
-        printf "\n"
-        printf "Missing parameters! Try:\n"
-        printf "progress_bar_create <dialog instance>\n"
-        printf "\n"
+        printf "\nMissing parameters! Try:\nprogress_bar_create <dialog instance>\n\n"
         
         return 1
     fi
@@ -137,14 +129,11 @@ progress_bar_was_canceled(){
 #
 progress_bar_exit(){
     
-    local progress_dialog_instance=$@
+    local progress_dialog_instance="${@}"
     
-    if [[ -z ${progress_dialog_instance} ]]; then
+    if [[ -z "${progress_dialog_instance}" ]]; then
         
-        printf "\n"
-        printf "Missing parameters! Try:\n"
-        printf "progress_bar_create <dialog instance>\n"
-        printf "\n"
+        printf "\nMissing parameters! Try:\nprogress_bar_create <dialog instance>\n\n"
         
         return 1
     fi
@@ -201,15 +190,15 @@ test01(){
     sleep 5
     
     printf "__Checking if it was canceled...\n"
-    progress_bar_was_canceled ${inst}
+    progress_bar_was_canceled "${inst}"
     sleep 5
     
     printf "__Checking if it was canceled again...\n"
-    progress_bar_was_canceled ${inst}
+    progress_bar_was_canceled "${inst}"
     sleep 5
     
     printf "__Exiting...\n"
-    progress_bar_exit ${inst}
+    progress_bar_exit "${inst}"
     
 
     printf "====================\n"
