@@ -31,6 +31,10 @@ function rm(){
         echo 'Try `rm --help` for more information'
         return 1
     fi
+   
+    if [[ "${1}" =~ ^-[rvf]+$ ]]; then
+      shift  
+    fi
     
     if [[ -f '/usr/bin/gvfs-trash' ]]; then
         local gvfs_version="$(gvfs-trash --version 2> /dev/null | cut -d ' ' -f 2)"
