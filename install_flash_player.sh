@@ -17,7 +17,7 @@
 set -o pipefail
 set -o nounset
 
-FLASH_TARBALL_NAME='install_flash_player_11_linux.x86_64.tar.gz'
+FLASH_TARBALL_NAME='flash_player_npapi_linux.x86_64.tar.gz'
 TMP_DIR="$(mktemp -d)"
 
 function fp_exit_with_error() {
@@ -57,7 +57,7 @@ function check_last_plugin_version(){
         -H 'Pragma: no-cache'  \
         -H 'Cache-Control: no-cache'  \
         2> /dev/null \
-    | egrep --color=auto '11.[0-9.]{4,20}\b' -o | head -1)
+    | egrep --color=auto '2[0-9].[0-9.]{4,20}\b' -o | head -1)
 
     if [[ -n "${flash_last_version}" ]]; then
         printf '%s' "${flash_last_version}"
