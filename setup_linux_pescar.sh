@@ -2,7 +2,7 @@
 #
 # Name: Setup GNU/Linux to Projeto Pescar Procempa
 # Author: Jonatha Daguerre Vasconcelos <jonatha@daguerre.com.br>
-# Version: 3.1.1 (25 Jun 2016)
+# Version: 3.2 (12 Jun 2017)
 # License: GPL
 #
 #
