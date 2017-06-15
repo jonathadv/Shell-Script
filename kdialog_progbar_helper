@@ -1,14 +1,25 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
-# ----------------------------------------------------------------------------
+# Name: Kdialog Progress bar Helper
+# Author: Jonatha Daguerre Vasconcelos <jonatha@daguerre.com.br>
+# Version: 1.2 (14 Jun 2017)
+# License: MIT
+#
+#                  DESCRIPTION
+#
 # This script helps to create and use KDialog progress bar with d-bus.
 #
-# Author: Jonatha Daguerre Vasconcelos <jonatha@daguerre.com.br>
-# Version: 1.1
-# Date: 27/08/2014
-# Update: 05/10/2016
-# Licence: GPL
-# ----------------------------------------------------------------------------
+#
+# Usage:
+#   source ./kdialog_progbar_helper
+#
+#
+#              CHANGE HISTORY
+#
+# 1.2 (14 Jun 2017) - Updated comments and license; improved comments.
+# 1.1 (05 Out 2016) - Code style
+# 1.0 (27 Aug 2014) - First version
+#
 
 
 
@@ -20,8 +31,6 @@
 #
 # Returns:
 #  The d-bus reference for the dialog box.
-## Params:
-#  Progress bar d-bus reference
 progress_bar_create(){
     
     local title="$1"
@@ -100,7 +109,6 @@ progress_bar_finish(){
 }
 
 
-
 #
 # Check if the "cancel" button was pressed
 # Params:
@@ -144,9 +152,6 @@ progress_bar_exit(){
 }
 
 
-
-
-
 #
 # Show a simple help text
 #
@@ -170,11 +175,6 @@ printf "\n====== H E L P ======\n"
     printf "\n\n====================\n"
 
 }
-
-
-
-
-
 
 
 # Run tests
@@ -201,19 +201,7 @@ test01(){
     progress_bar_exit "${inst}"
     
 
-    printf "====================\n"
-    
+    printf "====================\n"   
 
 }
-
-
-
-
-
-
-
-
-
-
-
 
