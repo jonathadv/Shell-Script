@@ -12,7 +12,7 @@
 # Author: Jonatha Daguere Vasconcelos <jonatha@daguerre.com.br>
 # Since: 22/10/2014
 # Version: 1.0
-# Licence: GPL
+# Licence: MIT
 # ----------------------------------------------------------------------------
 
 # Use curl to get the commmit message
