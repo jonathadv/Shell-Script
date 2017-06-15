@@ -7,7 +7,7 @@
 # Author: Jonatha Daguerre Vasconcelos <jonatha@daguerre.com.br>
 # Version: 2.0
 # Date: 20/07/2016
-# Licence: GPL
+# Licence: MIT
 #
 # Usage:
 # sudo ./install_flash_player.sh

@@ -6,7 +6,7 @@
 #
 # Autor: Jonatha Daguerre Vasconcelos
 # Data: 23/06/2013
-# Lincença: GPL
+# Lincença: MIT
 # ----------------------------------------------------------------------------
 
 # Verifica estado to touchpad (ativado/desativado)
